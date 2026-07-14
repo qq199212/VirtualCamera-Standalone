@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import <CoreMedia/CoreMedia.h>
+#import <objc/runtime.h>
 #import "substrate.h"
 
 static AVAssetReader *assetReader = nil;

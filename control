@@ -1,0 +1,9 @@
+Package: com.vcam.virtualcamera
+Name: VirtualCamera
+Version: 1.0.0
+Architecture: iphoneos-arm64e
+Description: 虚拟相机插件，本地视频替换相机输入，音视频同步，适配RootHide
+Maintainer: MWMWVIP (TG: @MWMWVIP)
+Author: MWMWVIP (TG: @MWMWVIP)
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.3000), firmware (>= 15.0)

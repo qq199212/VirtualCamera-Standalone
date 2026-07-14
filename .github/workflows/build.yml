@@ -1,0 +1,34 @@
+name: Build VirtualCamera
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ldid
+        run: brew install --HEAD ldid
+
+      - name: Compile dylib
+        run: |
+          xcrun -sdk iphoneos clang -arch arm64e -shared -o VirtualCamera.dylib Tweak.m -framework AVFoundation -framework CoreMedia -framework Foundation -miphoneos-version-min=15.0
+          ldid -S VirtualCamera.dylib
+
+      - name: Pack deb
+        run: |
+          mkdir -p deb/DEBIAN deb/Library/MobileSubstrate/DynamicLibraries
+          cp control deb/DEBIAN/control
+          cp VirtualCamera.dylib deb/Library/MobileSubstrate/DynamicLibraries/
+          dpkg-deb -b deb VirtualCamera_1.0.0_arm64e.deb
+          mkdir -p packages
+          mv *.deb packages/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VirtualCamera-deb
+          path: packages/*.deb

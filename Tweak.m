@@ -2,7 +2,11 @@
 #import <AVFoundation/AVFoundation.h>
 #import <CoreMedia/CoreMedia.h>
 #import <objc/runtime.h>
-#import "substrate.h"
+#import <dlfcn.h>
+
+// 动态加载MSHookMessageEx
+typedef void (*MSHookFunc)(Class, SEL, IMP, IMP *);
+static MSHookFunc MSHookMessageEx = NULL;
 
 static AVAssetReader *assetReader = nil;
 static AVAssetReaderTrackOutput *videoTrackOutput = nil;
@@ -90,6 +94,14 @@ static void replaced_captureOutput(id self, SEL _cmd, AVCaptureOutput *output, C
 
 // 插件加载时自动执行hook
 __attribute__((constructor)) static void vcam_init() {
+    // 动态加载Substrate
+    void *handle = dlopen("/Library/Frameworks/CydiaSubstrate.framework/CydiaSubstrate", RTLD_LAZY);
+    if (handle) {
+        MSHookMessageEx = (MSHookFunc)dlsym(handle, "MSHookMessageEx");
+    }
+    
+    if (!MSHookMessageEx) return;
+    
     Class videoCls = objc_getClass("AVCaptureVideoDataOutput");
     Class audioCls = objc_getClass("AVCaptureAudioDataOutput");
     Class nsobjCls = objc_getClass("NSObject");
